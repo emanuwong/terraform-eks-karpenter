@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-arm64
+  namespace: apps
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: busybox-arm64
+  template:
+    metadata:
+      labels:
+        app: busybox-arm64
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      containers:
+        - name: busybox
+          image: arm64v8/busybox
+          args: ["sleep", "3600"]
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "50Mi"
+            limits: # <-- Aquí es donde agregamos los límites
+              cpu: "200m"
+              memory: "100Mi"

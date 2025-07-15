@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: apps
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: nginx
+          image: nginx
+          resources:
+            requests:
+              cpu:  "500m"
+              memory: "50Mi"
+            limits:
+              cpu: "900m"
+              memory: "100Mi"

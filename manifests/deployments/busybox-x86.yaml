@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-x86
+  namespace: apps
+spec:
+  replicas: 8
+  selector:
+    matchLabels:
+      app: busybox-x86
+  template:
+    metadata:
+      labels:
+        app: busybox-x86
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: busybox
+          image: busybox
+          args: ["sleep", "3600"]
+          resources:
+            requests:
+              cpu:  "100m"
+              memory: "50Mi"
+            limits:
+              cpu: "200m"
+              memory: "100Mi"
