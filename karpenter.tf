@@ -3,11 +3,9 @@ resource "helm_release" "karpenter" {
   namespace        = "karpenter"
   create_namespace = true
 
-  repository          = "oci://public.ecr.aws/karpenter"
-  repository_username = data.aws_ecrpublic_authorization_token.token.user_name
-  repository_password = data.aws_ecrpublic_authorization_token.token.password
-  chart               = "karpenter"
-  version             = "1.5.2"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter"
+  version    = "1.5.2"
 
   set = [
     {
@@ -20,11 +18,11 @@ resource "helm_release" "karpenter" {
     },
     {
       name  = "settings.defaultInstanceProfile"
-      value = aws_iam_instance_profile.karpenter_node.name
+      value = module.karpenter_iam.karpenter_node_instance_profile_name
     },
     {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-      value = aws_iam_role.karpenter_controller.arn
+      value = module.karpenter_iam.karpenter_controller_role_arn
     },
     {
       name  = "nodeSelector.dedicated"
@@ -33,7 +31,6 @@ resource "helm_release" "karpenter" {
   ]
 
   depends_on = [
-    aws_iam_role.karpenter_controller,
-    data.aws_ecrpublic_authorization_token.token
+    module.karpenter_iam
   ]
 }

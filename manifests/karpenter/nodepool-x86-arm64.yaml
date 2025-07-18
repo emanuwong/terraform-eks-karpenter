@@ -1,0 +1,49 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  # The name of your NodePool.
+  name: default-spot-x86-armd64-nodepool
+spec:
+  # `template` defines the requirements for the nodes to be provisioned.
+  template:
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: spot-x86-armd64
+      # `requirements` specify the constraints for instance selection.
+      requirements:
+        # Request instances that are either spot or on-demand.
+        # This NodePool prioritizes spot as it is typically more cost-effective.
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values:
+            - spot
+        # Allow both amd64 (x86_64) and arm64 architectures.
+        - key: kubernetes.io/arch
+          operator: In
+          values:
+            - amd64
+            - arm64
+        # Restrict instance types to common categories.
+        # Ensure instances are a modern generation (e.g., M6, C6, R6 or newer).
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values:
+            - "5"
+      # `providerRef` links this NodePool to the EC2NodeClass defined above.
+  # `limits` set a hard limit on the total capacity of this NodePool.
+  # This is a useful safety measure to prevent excessive costs.
+  limits:
+    cpu: "10" # Max 10 vCPUs in this NodePool
+
+  # `disruption` defines the lifecycle management of nodes.
+  disruption:
+    # `consolidationPolicy` can be "WhenUnderutilized" or "WhenEmpty".
+    # WhenEmpty: only terminate a node when it has no pods.
+    consolidationPolicy: WhenEmpty
+    # `consolidateAfter` is the time Karpenter waits for an empty node to be consolidated.
+    consolidateAfter: 30s
+    # `expireAfter` is the maximum lifetime of a node.
+    # A value of 720h (30 days) is a common best practice for security and node rotation.
+    expireAfter: 720h

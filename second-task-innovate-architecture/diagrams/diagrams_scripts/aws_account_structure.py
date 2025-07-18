@@ -5,7 +5,6 @@ from diagrams.aws.general import Users
 
 with Diagram("AWS Account Structure for Innovate Inc.", show=True, filename="../diagrams_img/aws_account_structure", outformat="png", direction="TB"):
     
-    # Nivel superior
     company = Users("Innovate Inc.")
     sso = IAM("IAM Identity Center (SSO)")
     company >> sso
@@ -25,7 +24,6 @@ with Diagram("AWS Account Structure for Innovate Inc.", show=True, filename="../
             with Cluster("Production"):
                 prod = Organizations("Production")
 
-        # Relaciones explícitas desde Management a las cuentas
         mgmt >> shared
         mgmt >> dev
         mgmt >> prod
